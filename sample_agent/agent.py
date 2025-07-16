@@ -24,6 +24,8 @@ class AgentState(CopilotKitState):
     proverbs: list[str] = []
     # your_custom_agent_state: str = ""
 
+    language: Literal["english", "portuguese"] = "english"
+
 @tool
 def get_weather(location: str):
     """
