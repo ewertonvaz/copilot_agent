@@ -3,6 +3,8 @@ This is the main entry point for the agent.
 It defines the workflow graph, state, tools, nodes and edges.
 """
 
+import os
+from pathlib import Path
 from typing_extensions import Literal
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, AIMessage
@@ -33,6 +35,29 @@ def get_weather(location: str):
     """
     return f"The weather for {location} is 70 degrees."
 
+@tool
+def get_logo_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
+    """
+    Get the full URL path to the company logo image file.
+    
+    Args:
+        filename: The name of the image file. Defaults to logo_acAI_icone_transparente_300dpi.png
+    
+    Returns:
+        The full URL path to the image file
+    """
+    # Get the project root directory (parent of sample_agent directory)
+    current_file = Path(__file__)
+    project_root = current_file.parent.parent
+    
+    # Construct the path to the image file
+    image_path = project_root / "data" / "images" / filename
+    
+    # Convert to absolute path
+    absolute_path = image_path.absolute().as_uri()
+    
+    return absolute_path
+
 # @tool
 # def your_tool_here(your_arg: str):
 #     """Your tool description here."""
@@ -40,7 +65,8 @@ def get_weather(location: str):
 #     return "Your tool response here."
 
 tools = [
-    get_weather
+    get_weather,
+    get_logo_url
     # your_tool_here
 ]
 
@@ -64,6 +90,7 @@ async def chat_node(state: AgentState, config: RunnableConfig) -> Command[Litera
         [
             *state["copilotkit"]["actions"],
             get_weather,
+            get_logo_url,
             # your_tool_here
         ],
 
