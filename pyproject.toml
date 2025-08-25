@@ -6,6 +6,7 @@ authors = ["Markus Ecker <markus.ecker@gmail.com>"]
 license = "MIT"
 
 [project]
+requires-python = ">=3.10,<3.13"
 name = "sample_agent"
 version = "0.0.1"
 dependencies = [

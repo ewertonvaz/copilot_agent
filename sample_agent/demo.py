@@ -9,11 +9,18 @@ load_dotenv() # pylint: disable=wrong-import-position
 
 from fastapi import FastAPI
 import uvicorn
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
 from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
 from sample_agent.agent import graph
 
 app = FastAPI()
+
+# Mount the images directory as a static files directory
+images_directory = Path(__file__).parent / "images"
+app.mount("/images", StaticFiles(directory=str(images_directory)), name="images")
+
 sdk = CopilotKitRemoteEndpoint(
     agents=[
         LangGraphAgent(
@@ -35,3 +42,6 @@ def main():
         port=port,
         reload=True,
     )
+
+if __name__ == "__main__":
+    main()

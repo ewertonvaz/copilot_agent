@@ -9,6 +9,7 @@ from typing_extensions import Literal
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
+from langgraph.checkpoint.memory import MemorySaver
 from langchain.tools import tool
 from langgraph.graph import StateGraph, END
 from langgraph.types import Command
@@ -51,10 +52,12 @@ def get_logo_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
     project_root = current_file.parent.parent
     
     # Construct the path to the image file
-    image_path = project_root / "data" / "images" / filename
+    #image_path = project_root / "images" / filename
+    image_path = "http://localhost:8000/images/" + filename
     
     # Convert to absolute path
-    absolute_path = image_path.absolute().as_uri()
+    #absolute_path = image_path.absolute().as_uri()
+    absolute_path = image_path
     
     return absolute_path
 
@@ -140,4 +143,5 @@ workflow.add_edge("tool_node", "chat_node")
 workflow.set_entry_point("chat_node")
 
 # Compile the workflow graph
-graph = workflow.compile()
+checkpointer = MemorySaver()
+graph = workflow.compile(checkpointer=checkpointer)
