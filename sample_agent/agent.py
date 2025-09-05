@@ -37,7 +37,7 @@ def get_weather(location: str):
     return f"The weather for {location} is 70 degrees."
 
 @tool
-def get_logo_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
+def get_image_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
     """
     Get the full URL path to the company logo image file.
     
@@ -69,7 +69,7 @@ def get_logo_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
 
 tools = [
     get_weather,
-    get_logo_url
+    get_image_url
     # your_tool_here
 ]
 
@@ -93,7 +93,7 @@ async def chat_node(state: AgentState, config: RunnableConfig) -> Command[Litera
         [
             *state["copilotkit"]["actions"],
             get_weather,
-            get_logo_url,
+            get_image_url,
             # your_tool_here
         ],
 
@@ -105,7 +105,10 @@ async def chat_node(state: AgentState, config: RunnableConfig) -> Command[Litera
 
     # 3. Define the system message by which the chat model will be run
     system_message = SystemMessage(
-        content=f"You are a helpful assistant. Talk in {state.get('language', 'english')}."
+        content=f"""You are a helpful assistant. Talk in {state.get('language', 'english')}.
+
+        If you need to show or generate any image, use the get_image_url tool.
+        """
     )
 
     # 4. Run the model to generate a response
