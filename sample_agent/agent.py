@@ -53,7 +53,7 @@ def get_image_url(filename: str = "logo_acAI_icone_transparente_300dpi.png"):
     
     # Construct the path to the image file
     #image_path = project_root / "images" / filename
-    image_path = "http://localhost:8080/images/" + filename
+    image_path = f"http://localhost:{os.getenv('PORT', '8000')}/images/{filename}"
     
     # Convert to absolute path
     #absolute_path = image_path.absolute().as_uri()
