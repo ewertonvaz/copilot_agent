@@ -17,9 +17,11 @@ dependencies = [
     "langchain-community",
     "copilotkit",
     "uvicorn",
-    "python-dotenv",
-    "langchain-core",
-    "langgraph-cli"
+    "pydantic-settings>=2.0.0",
+    "langchain-core>=0.3.68",
+    "langgraph-cli",
+    "langgraph-checkpoint-postgres>=2.0.0",
+    "psycopg[binary]>=3.1.0",
 ]
 
 [build-system]

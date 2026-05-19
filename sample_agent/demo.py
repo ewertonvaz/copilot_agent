@@ -3,20 +3,41 @@ This serves the "sample_agent" agent. This is an example of self-hosting an agen
 through our FastAPI integration. However, you can also host in LangGraph platform.
 """
 
-import os
-from dotenv import load_dotenv
-load_dotenv() # pylint: disable=wrong-import-position
-
 from fastapi import FastAPI
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitRemoteEndpoint, LangGraphAgent
-from sample_agent.agent import graph
+from contextlib import asynccontextmanager
+from copilotkit import LangGraphAGUIAgent
+from ag_ui_langgraph import add_langgraph_fastapi_endpoint
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from sample_agent.agent import workflow
+from sample_agent.settings import settings
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with AsyncPostgresSaver.from_conn_string(
+        settings.database_url,
+    ) as checkpointer:
+        await checkpointer.setup()
+        graph = workflow.compile(checkpointer=checkpointer)
+
+        add_langgraph_fastapi_endpoint(
+            app=app,
+            agent=LangGraphAGUIAgent(
+                name="sample_agent",
+                description="An example agent to use as a starting point for your own agent.",
+                graph=graph,
+            ),
+            path="/agents/sample_agent"
+        )
+
+        yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -32,32 +53,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount the images directory as a static files directory
 images_directory = Path(__file__).parent / "images"
 app.mount("/images", StaticFiles(directory=str(images_directory)), name="images")
 
-sdk = CopilotKitRemoteEndpoint(
-    agents=[
-        LangGraphAgent(
-            name="sample_agent",
-            description="An example agent to use as a starting point for your own agent.",
-            graph=graph,
-        )
-    ],
-)
-
-add_fastapi_endpoint(app, sdk, "/copilotkit")
 
 def main():
     """Run the uvicorn server."""
-    print(os.getenv("PORT"))
-    port = int(os.getenv("PORT", "8000"))
     uvicorn.run(
         "sample_agent.demo:app",
         host="0.0.0.0",
-        port=port,
-        reload=True,
+        port=settings.port,
+        reload=settings.dev_mode,
     )
+
 
 if __name__ == "__main__":
     main()

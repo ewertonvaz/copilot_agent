@@ -9,6 +9,8 @@ Requires-Dist: openai
 Requires-Dist: langchain-community
 Requires-Dist: copilotkit
 Requires-Dist: uvicorn
-Requires-Dist: python-dotenv
-Requires-Dist: langchain-core
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: langchain-core>=0.3.68
 Requires-Dist: langgraph-cli
+Requires-Dist: langgraph-checkpoint-postgres>=2.0.0
+Requires-Dist: psycopg[binary]>=3.1.0
